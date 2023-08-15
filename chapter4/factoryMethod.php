@@ -1,15 +1,8 @@
 <?php
 
-class SimplePizzaFactory
-{
-    public function createPizza(string $type)
-    {
-    }
-}
-
 abstract class PizzaStore
 {
-    public function __construct(SimplePizzaFactory $Factory)
+    public function __construct()
     {
     }
 
@@ -22,6 +15,7 @@ abstract class PizzaStore
         $Pizza->box();
     }
 
+    // 製品の作成はサブクラスが行う
     abstract public function createPizza(string $item);
 }
 
@@ -44,56 +38,60 @@ class NYPizzaStore extends PizzaStore
 
 abstract class Pizza
 {
-    private $__name = "";
-    private $__dough = "";
-    private $__sauce = "";
-    private $__toppings = [];
-}
+    public $__name = "";
+    public $__dough = "";
+    public $__sauce = "";
+    public $__toppings = [];
 
-class NYCheesePizza
-{
     public function prepare()
     {
+        echo $this->__name . "を下処理\n";
+        echo "生地を捏ねる\n";
+        echo "ソースを追加\n";
+        echo "トッピングを追加\n";
+        for ($i = 0; $i < count($this->__toppings); $i++) {
+            echo " " . $this->__toppings[$i] . "\n";
+        }
     }
-    public function bake()
-    {
-    }
-    public function cut()
-    {
-    }
-    public function box()
-    {
-    }
-}
 
-class NYPepperoniPizza
-{
-    public function prepare()
-    {
-    }
     public function bake()
     {
+        echo "350度で25分焼く\n";
     }
+
     public function cut()
     {
+        echo "ピザを扇状に切り分ける\n";
     }
+
     public function box()
     {
+        echo "箱にピザを入れる\n";
+    }
+    public function getName()
+    {
+        return $this->__name;
     }
 }
 
-class NYVeggiePizza
+class NYCheesePizza extends Pizza
 {
-    public function prepare()
+    public function __construct()
     {
-    }
-    public function bake()
-    {
-    }
-    public function cut()
-    {
-    }
-    public function box()
-    {
+        $this->__name = "NYピザ";
+        $this->__dough = "薄いクラスト生地";
+        $this->__sauce = "マリナラソース";
+        array_push($this->__toppings, "粉エッジャーノチーズ");
     }
 }
+
+class NYPepperoniPizza extends Pizza
+{
+}
+
+class NYVeggiePizza extends Pizza
+{
+}
+
+$nyStore = new NYPizzaStore();
+$nyStore->orderPizza("チーズ");
