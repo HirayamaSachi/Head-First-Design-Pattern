@@ -1,37 +1,44 @@
 <?php
-interface Command{
+interface Command
+{
     public function execute();
     public function undo();
 }
 
-class LightOnCommand implements Command{
+class LightOnCommand implements Command
+{
     // コマンド
     public $light;
     public function __construct($light)
     {
         $this->light = $light;
     }
-    public function execute(){
+    public function execute()
+    {
         // レシーバー
         $this->light->on();
     }
-    public function undo(){
+    public function undo()
+    {
         $this->light->off();
     }
 }
 
-class LightOffCommand implements Command{
+class LightOffCommand implements Command
+{
     // コマンド
     public $light;
     public function __construct($light)
     {
         $this->light = $light;
     }
-    public function execute(){
+    public function execute()
+    {
         // レシーバー
         $this->light->off();
     }
-    public function undo(){
+    public function undo()
+    {
         $this->light->on();
     }
 }
@@ -53,7 +60,6 @@ class StereoOnWithCDCommand implements Command
     {
         $this->stereo->off();
     }
-    
 }
 
 class StereoOffWithCDCommand implements Command
@@ -76,20 +82,24 @@ class StereoOffWithCDCommand implements Command
     }
 }
 
-class Light{
+class Light
+{
     public function __construct()
     {
     }
-    public function on(){
+    public function on()
+    {
         echo "ライトon\n";
     }
 
-    public function off(){
+    public function off()
+    {
         echo "ライトoff\n";
     }
 }
 
-class Stereo{
+class Stereo
+{
     public int $volume = 1;
     public function __construct()
     {
@@ -117,22 +127,27 @@ class Stereo{
     }
 }
 
-class SimpleRemoteControl{
+class SimpleRemoteControl
+{
     public $Slot;
     public function __construct()
     {
     }
-    public function setCommand($Command){
+    public function setCommand($Command)
+    {
         $this->Slot = $Command;
     }
-    public function buttonWasPressed(){
+    public function buttonWasPressed()
+    {
         // インボーカ
         $this->Slot->execute();
     }
 }
 
-class RemoteControlTest{
-    public static function main(){
+class RemoteControlTest
+{
+    public static function main()
+    {
         $remote = new SimpleRemoteControl();
         $light = new Light();
         $command = new LightOnCommand($light);
@@ -197,8 +212,10 @@ class RemoteControl
     }
 }
 
-class RemoteLoader{
-    public static function main(array $args){
+class RemoteLoader
+{
+    public static function main(array $args)
+    {
         $remoteControl = new RemoteControl();
         $light = new Light();
         $lightOnCommand = new LightOnCommand($light);
@@ -213,7 +230,7 @@ class RemoteLoader{
         $ceilingFan = new CeilingFan("リビング");
         $ceilingFanHighCommand = new CeilingFanHighCommand($ceilingFan);
         $ceilingFanOffCommand = new CeilingFanOffCommand($ceilingFan);
-        $remoteControl->setCommand(3,$ceilingFanHighCommand,$ceilingFanOffCommand);
+        $remoteControl->setCommand(3, $ceilingFanHighCommand, $ceilingFanOffCommand);
 
         $remoteControl->onButtonWasPushed(1);
         $remoteControl->onButtonWasPushed(2);
@@ -274,12 +291,13 @@ class CeilingFan
     }
 }
 
-class CeilingFanHighCommand implements Command{
+class CeilingFanHighCommand implements Command
+{
     public CeilingFan $ceilingFan;
     public int $prevSpeed;
     public function __construct(CeilingFan $ceilingFan)
     {
-        $this->ceilingFan =$ceilingFan;
+        $this->ceilingFan = $ceilingFan;
     }
     public function execute()
     {
@@ -291,30 +309,31 @@ class CeilingFanHighCommand implements Command{
     {
         $prevSpeed = $this->prevSpeed;
         $ceilingFan = $this->ceilingFan;
-        if($prevSpeed == $ceilingFan::$HIGH){
+        if ($prevSpeed == $ceilingFan::$HIGH) {
             $ceilingFan->high();
-        }elseif($prevSpeed == $ceilingFan::$MEDIUM){
+        } elseif ($prevSpeed == $ceilingFan::$MEDIUM) {
             $ceilingFan->medium();
-        }elseif($prevSpeed == $ceilingFan::$LOW){
+        } elseif ($prevSpeed == $ceilingFan::$LOW) {
             $ceilingFan->low();
-        }elseif($prevSpeed == $ceilingFan::$OFF){
+        } elseif ($prevSpeed == $ceilingFan::$OFF) {
             $ceilingFan->off();
         }
     }
 }
 
-class CeilingFanOffCommand implements Command{
+class CeilingFanOffCommand implements Command
+{
     public CeilingFan $ceilingFan;
     // undoに状態を保存する
     public int $prevSpeed;
     public function __construct(CeilingFan $ceilingFan)
     {
-        $this->ceilingFan =$ceilingFan;
+        $this->ceilingFan = $ceilingFan;
     }
     public function execute()
     {
         // 以前の状態を保存する
-        $this->prevSpeed =$this->ceilingFan->getSpeed();
+        $this->prevSpeed = $this->ceilingFan->getSpeed();
         $this->ceilingFan->off();
     }
 
@@ -323,13 +342,13 @@ class CeilingFanOffCommand implements Command{
         $prevSpeed = $this->prevSpeed;
         $ceilingFan = $this->ceilingFan;
         // undoの状態をもとにspeedを決める
-        if($prevSpeed == $ceilingFan->HIGH){
+        if ($prevSpeed == $ceilingFan->HIGH) {
             $ceilingFan->high();
-        }elseif($prevSpeed == $ceilingFan->MEDIUM){
+        } elseif ($prevSpeed == $ceilingFan->MEDIUM) {
             $ceilingFan->medium();
-        }elseif($prevSpeed == $ceilingFan->LOW){
+        } elseif ($prevSpeed == $ceilingFan->LOW) {
             $ceilingFan->low();
-        }elseif($prevSpeed == $ceilingFan->OFF){
+        } elseif ($prevSpeed == $ceilingFan->OFF) {
             $ceilingFan->off();
         }
     }
