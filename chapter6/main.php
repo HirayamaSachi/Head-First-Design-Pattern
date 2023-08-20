@@ -210,15 +210,128 @@ class RemoteLoader{
         $stereoOffWithCDCommand = new StereoOffWithCDCommand($stereo);
         $remoteControl->setCommand(2, $stereoOnWithCDCommand, $stereoOffWithCDCommand);
 
+        $ceilingFan = new CeilingFan("リビング");
+        $ceilingFanHighCommand = new CeilingFanHighCommand($ceilingFan);
+        $ceilingFanOffCommand = new CeilingFanOffCommand($ceilingFan);
+        $remoteControl->setCommand(3,$ceilingFanHighCommand,$ceilingFanOffCommand);
+
         $remoteControl->onButtonWasPushed(1);
         $remoteControl->onButtonWasPushed(2);
-        $remoteControl->onButtonWasPushed(3);
-
         $remoteControl->offButtonWasPushed(1);
         $remoteControl->undoButtonWasPushed();
         $remoteControl->offButtonWasPushed(2);
         $remoteControl->undoButtonWasPushed();
 
+        $remoteControl->onButtonWasPushed(3);
+        $remoteControl->undoButtonWasPushed();
+    }
+}
+
+
+class CeilingFan
+{
+    public static $HIGH = 3;
+    public static $MEDIUM = 2;
+    public static $LOW = 1;
+    public static $OFF = 0;
+
+    public string $location;
+    public int $speed;
+
+    public function __construct(String $location)
+    {
+        $this->location = $location;
+        $this->speed = self::$OFF;
+    }
+
+    public function high()
+    {
+        $this->speed = self::$HIGH;
+        echo $this->speed;
+    }
+
+    public function medium()
+    {
+        $this->speed = self::$MEDIUM;
+        echo $this->speed;
+    }
+
+    public function low()
+    {
+        $this->speed = self::$LOW;
+        echo $this->speed;
+    }
+
+    public function off()
+    {
+        $this->speed = self::$OFF;
+        echo $this->speed;
+    }
+
+    public function getSpeed()
+    {
+        return $this->speed;
+    }
+}
+
+class CeilingFanHighCommand implements Command{
+    public CeilingFan $ceilingFan;
+    public int $prevSpeed;
+    public function __construct(CeilingFan $ceilingFan)
+    {
+        $this->ceilingFan =$ceilingFan;
+    }
+    public function execute()
+    {
+        $this->prevSpeed = $this->ceilingFan->getSpeed();
+        $this->ceilingFan->high();
+    }
+
+    public function undo()
+    {
+        $prevSpeed = $this->prevSpeed;
+        $ceilingFan = $this->ceilingFan;
+        if($prevSpeed == $ceilingFan::$HIGH){
+            $ceilingFan->high();
+        }elseif($prevSpeed == $ceilingFan::$MEDIUM){
+            $ceilingFan->medium();
+        }elseif($prevSpeed == $ceilingFan::$LOW){
+            $ceilingFan->low();
+        }elseif($prevSpeed == $ceilingFan::$OFF){
+            $ceilingFan->off();
+        }
+    }
+}
+
+class CeilingFanOffCommand implements Command{
+    public CeilingFan $ceilingFan;
+    // undoに状態を保存する
+    public int $prevSpeed;
+    public function __construct(CeilingFan $ceilingFan)
+    {
+        $this->ceilingFan =$ceilingFan;
+    }
+    public function execute()
+    {
+        // 以前の状態を保存する
+        $this->prevSpeed =$this->ceilingFan->getSpeed();
+        $this->ceilingFan->off();
+    }
+
+    public function undo()
+    {
+        $prevSpeed = $this->prevSpeed;
+        $ceilingFan = $this->ceilingFan;
+        // undoの状態をもとにspeedを決める
+        if($prevSpeed == $ceilingFan->HIGH){
+            $ceilingFan->high();
+        }elseif($prevSpeed == $ceilingFan->MEDIUM){
+            $ceilingFan->medium();
+        }elseif($prevSpeed == $ceilingFan->LOW){
+            $ceilingFan->low();
+        }elseif($prevSpeed == $ceilingFan->OFF){
+            $ceilingFan->off();
+        }
     }
 }
 
