@@ -1,6 +1,7 @@
 <?php
 interface Command{
     public function execute();
+    public function undo();
 }
 
 class LightOnCommand implements Command{
@@ -14,6 +15,9 @@ class LightOnCommand implements Command{
         // レシーバー
         $this->light->on();
     }
+    public function undo(){
+        $this->light->off();
+    }
 }
 
 class LightOffCommand implements Command{
@@ -26,6 +30,9 @@ class LightOffCommand implements Command{
     public function execute(){
         // レシーバー
         $this->light->off();
+    }
+    public function undo(){
+        $this->light->on();
     }
 }
 
@@ -42,6 +49,11 @@ class StereoOnWithCDCommand implements Command
         $this->stereo->setCD();
         $this->stereo->setVolume(11);
     }
+    public function undo()
+    {
+        $this->stereo->off();
+    }
+    
 }
 
 class StereoOffWithCDCommand implements Command
@@ -54,6 +66,13 @@ class StereoOffWithCDCommand implements Command
     public function execute()
     {
         $this->stereo->off();
+    }
+
+    public function undo()
+    {
+        $this->stereo->on();
+        $this->stereo->setCD();
+        $this->stereo->setVolume(11);
     }
 }
 
@@ -132,12 +151,16 @@ class NoCommand implements Command
     public function execute()
     {
     }
+    public function undo()
+    {
+    }
 }
 
 class RemoteControl
 {
     public array $onCommands;
     public array $offCommands;
+    public Command $undoCommand;
 
     public function __construct()
     {
@@ -147,6 +170,7 @@ class RemoteControl
             $this->onCommands[$i] = $noCommand;
             $this->offCommands[$i] = $noCommand;
         }
+        $this->undoCommand = $noCommand;
     }
 
     public function setCommand(int $slot, $onCommand, $offCommand)
@@ -155,12 +179,21 @@ class RemoteControl
         $this->offCommands[$slot] = $offCommand;
     }
 
-    public function onButtonWasPushed(int $slot){
+    public function onButtonWasPushed(int $slot)
+    {
         $this->onCommands[$slot]->execute();
+        $this->undoCommand = $this->onCommands[$slot];
     }
 
-    public function offButtonWasPushed(int $slot){
+    public function offButtonWasPushed(int $slot)
+    {
         $this->offCommands[$slot]->execute();
+        $this->undoCommand = $this->offCommands[$slot];
+    }
+
+    public function undoButtonWasPushed()
+    {
+        $this->undoCommand->undo();
     }
 }
 
@@ -182,7 +215,10 @@ class RemoteLoader{
         $remoteControl->onButtonWasPushed(3);
 
         $remoteControl->offButtonWasPushed(1);
+        $remoteControl->undoButtonWasPushed();
         $remoteControl->offButtonWasPushed(2);
+        $remoteControl->undoButtonWasPushed();
+
     }
 }
 
