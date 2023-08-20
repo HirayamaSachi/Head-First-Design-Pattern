@@ -232,15 +232,14 @@ class RemoteLoader
         $ceilingFanOffCommand = new CeilingFanOffCommand($ceilingFan);
         $remoteControl->setCommand(3, $ceilingFanHighCommand, $ceilingFanOffCommand);
 
-        $remoteControl->onButtonWasPushed(1);
-        $remoteControl->onButtonWasPushed(2);
-        $remoteControl->offButtonWasPushed(1);
-        $remoteControl->undoButtonWasPushed();
-        $remoteControl->offButtonWasPushed(2);
-        $remoteControl->undoButtonWasPushed();
+        $partyOn = [$lightOnCommand, $stereoOnWithCDCommand, $ceilingFanHighCommand];
+        $partyOff = [$lightOffCommand, $stereoOffWithCDCommand, $ceilingFanOffCommand];
 
-        $remoteControl->onButtonWasPushed(3);
-        $remoteControl->undoButtonWasPushed();
+        $partyOnMacro = new MacroCommand($partyOn);
+        $partyOffMacro = new MacroCommand($partyOff);
+        $remoteControl->setCommand(4, $partyOnMacro, $partyOffMacro);
+
+        $remoteControl->onButtonWasPushed(4);
     }
 }
 
@@ -351,6 +350,25 @@ class CeilingFanOffCommand implements Command
         } elseif ($prevSpeed == $ceilingFan->OFF) {
             $ceilingFan->off();
         }
+    }
+}
+
+class MacroCommand implements Command
+{
+    public array $commands;
+    public function __construct(array $commands)
+    {
+        $this->commands = $commands;
+    }
+    public function execute()
+    {
+        foreach ($this->commands as $command) {
+            $command->execute();
+        }
+    }
+
+    public function undo()
+    {
     }
 }
 
