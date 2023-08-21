@@ -66,6 +66,7 @@ $turkeyAdapter = new TurkeyAdapter($turkey);
 $turkey->gobble();
 $duck->quack();
 $turkeyAdapter->quack();
+echo "\n--------------\n";
 
 class HomeTheaterFacade
 {
@@ -78,7 +79,7 @@ class HomeTheaterFacade
     public Screes $screen;
     public PopcornPopper $popper;
 
-    public function HomeTheaterFacade(
+    public function __construct(
         Amplifier $amp,
         Tuner $tuner,
         DvdPlayer $dvd,
@@ -98,8 +99,9 @@ class HomeTheaterFacade
         $this->amp = $amp;
     }
 
-    public function watchMovie(String $movie){
-        echo "映画を見る準備をします";
+    public function watchMovie(String $movie)
+    {
+        echo "映画を見る準備をします\n";
         $this->popper->on();
         $this->popper->pop();
         $this->lights->dim(10);
@@ -114,8 +116,9 @@ class HomeTheaterFacade
         $this->dvd->play($movie);
     }
 
-    public function endMovie(){
-        echo "ムービーシアターを停止します";
+    public function endMovie()
+    {
+        echo "ムービーシアターを停止します\n";
         $this->popper->off();
         $this->lights->on();
         $this->screen->up();
@@ -133,16 +136,19 @@ class PopcornPopper
     {
     }
 
-    public function on(){
-        echo "popをonする";
+    public function on()
+    {
+        echo "popをonする\n";
     }
 
-    public function pop(){
-        echo "popをpopする";
+    public function pop()
+    {
+        echo "popをpopする\n";
     }
 
-    public function off(){
-        echo "popをoffする";
+    public function off()
+    {
+        echo "popをoffする\n";
     }
 }
 class Screes
@@ -151,12 +157,14 @@ class Screes
     {
     }
 
-    public function down(){
-        echo "スクリーンをdownする";
+    public function down()
+    {
+        echo "スクリーンをdownする\n";
     }
 
-    public function up(){
-        echo "スクリーンをupする";
+    public function up()
+    {
+        echo "スクリーンをupする\n";
     }
 }
 class TheaterLights
@@ -165,11 +173,13 @@ class TheaterLights
     {
     }
 
-    public function dim(int $mode){
-        echo "ライトの明るさを{$mode}にします";
+    public function dim(int $mode)
+    {
+        echo "ライトの明るさを{$mode}にします\n";
     }
 
-    public function on(){
+    public function on()
+    {
         "ライトをつけます";
     }
 }
@@ -177,6 +187,18 @@ class Projector
 {
     public function __construct()
     {
+    }
+    public function on()
+    {
+        echo "プロジェクターをonにします\n";
+    }
+    public function wideScreenMode()
+    {
+        echo "プロジェクターをwideScreenModeにします\n";
+    }
+    public function off()
+    {
+        echo "プロジェクターをoffにします\n";
     }
 }
 class CdPlayer
@@ -190,6 +212,26 @@ class DvdPlayer
     public function __construct()
     {
     }
+    public function on()
+    {
+        echo "DVDをonにします\n";
+    }
+    public function play()
+    {
+        echo "DVDをplayにします\n";
+    }
+    public function stop()
+    {
+        echo "DVDをstopにします\n";
+    }
+    public function eject()
+    {
+        echo "DVDをejectにします\n";
+    }
+    public function off()
+    {
+        echo "DVDをoffにします\n";
+    }
 }
 class Tuner
 {
@@ -202,4 +244,54 @@ class Amplifier
     public function __construct()
     {
     }
+    public function on()
+    {
+        echo "アンプをonにします\n";
+    }
+    public function setDvd()
+    {
+        echo "アンプをsetDvdにします\n";
+    }
+    public function setSurroundSound()
+    {
+        echo "アンプをsetSurroundSoundにします\n";
+    }
+    public function setVolume()
+    {
+        echo "アンプをsetVolumeにします\n";
+    }
+    public function off()
+    {
+        echo "アンプをoffにします\n";
+    }
 }
+
+class HomeTheaterTestDrive
+{
+    public static function main()
+    {
+        $popcornPopper = new PopcornPopper();
+        $screes = new Screes();
+        $theaterLights = new TheaterLights();
+        $projector = new Projector();
+        $cdPlayer = new CdPlayer();
+        $dvdPlayer = new DvdPlayer();
+        $tuner = new Tuner();
+        $amplifier = new Amplifier();
+
+        $homeTheater = new HomeTheaterFacade(
+            $amplifier,
+            $tuner,
+            $dvdPlayer,
+            $cdPlayer,
+            $projector,
+            $theaterLights,
+            $screes,
+            $popcornPopper
+        );
+        $homeTheater->watchMovie("のび太のひみつ道具博物館");
+        $homeTheater->endMovie();
+    }
+}
+
+HomeTheaterTestDrive::main();
